@@ -17,6 +17,16 @@ class TodoService {
       todos = todos.filter(t => t.priority === filters.priority.toLowerCase());
     }
 
+    // Filter by taskType (dueDate / recurring)
+    if (filters.taskType && ['dueDate', 'recurring'].includes(filters.taskType)) {
+      todos = todos.filter(t => (t.taskType || 'dueDate') === filters.taskType);
+    }
+
+    // Filter by frequency (once / daily / weekly)
+    if (filters.frequency && ['once', 'daily', 'weekly'].includes(filters.frequency.toLowerCase())) {
+      todos = todos.filter(t => (t.frequency || 'once') === filters.frequency.toLowerCase());
+    }
+
     // Search query
     if (filters.search) {
       const query = filters.search.toLowerCase();
@@ -71,12 +81,20 @@ class TodoService {
     const completed = all.filter(t => t.completed).length;
     const active = total - completed;
     const highPriority = all.filter(t => !t.completed && t.priority === 'high').length;
+    const dueDateCount = all.filter(t => (t.taskType || 'dueDate') === 'dueDate').length;
+    const recurringCount = all.filter(t => t.taskType === 'recurring').length;
+    const dailyCount = all.filter(t => t.frequency === 'daily').length;
+    const weeklyCount = all.filter(t => t.frequency === 'weekly').length;
 
     return {
       total,
       completed,
       active,
-      highPriority
+      highPriority,
+      dueDateCount,
+      recurringCount,
+      dailyCount,
+      weeklyCount
     };
   }
 }

@@ -1,7 +1,7 @@
 const ApiError = require('../errors/ApiError');
 
 function validateCreateTodo(req, res, next) {
-  const { title, priority, dueDate } = req.body;
+  const { title, priority, dueDate, taskType, frequency } = req.body;
   const errors = [];
 
   if (!title || typeof title !== 'string' || title.trim() === '') {
@@ -16,6 +16,14 @@ function validateCreateTodo(req, res, next) {
     errors.push('dueDate');
   }
 
+  if (taskType && !['dueDate', 'recurring'].includes(taskType)) {
+    errors.push('taskType');
+  }
+
+  if (frequency && !['once', 'daily', 'weekly'].includes(frequency.toLowerCase())) {
+    errors.push('frequency');
+  }
+
   if (errors.length > 0) {
     return next(ApiError.badRequest('Validation failed for submitted task', errors, 'VALIDATION_FAILED'));
   }
@@ -24,7 +32,7 @@ function validateCreateTodo(req, res, next) {
 }
 
 function validateUpdateTodo(req, res, next) {
-  const { title, priority, dueDate, completed } = req.body;
+  const { title, priority, dueDate, completed, taskType, frequency } = req.body;
   const errors = [];
 
   if (title !== undefined && (typeof title !== 'string' || title.trim() === '')) {
@@ -41,6 +49,14 @@ function validateUpdateTodo(req, res, next) {
 
   if (completed !== undefined && typeof completed !== 'boolean') {
     errors.push('completed');
+  }
+
+  if (taskType !== undefined && !['dueDate', 'recurring'].includes(taskType)) {
+    errors.push('taskType');
+  }
+
+  if (frequency !== undefined && !['once', 'daily', 'weekly'].includes(frequency.toLowerCase())) {
+    errors.push('frequency');
   }
 
   if (errors.length > 0) {
