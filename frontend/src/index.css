@@ -130,6 +130,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
+  margin-right: 1.5rem;
 }
 
 .brand {
@@ -844,6 +845,10 @@ body {
 .main-content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding-right: 1.5rem;
 }
 
 /* Task Function Selector in TodoForm */
