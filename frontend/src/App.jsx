@@ -28,9 +28,14 @@ export default function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  const fetchTodos = async () => {
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  // Fetch data with abort controller signal to prevent search race conditions
+  const fetchTodos = async (signal) => {
     try {
-      setIsLoading(true);
+      if (isInitialLoading) {
+        setIsLoading(true);
+      }
       const queryParams = { ...filters };
 
       if (activeView === 'dueDate') {
@@ -42,12 +47,15 @@ export default function App() {
         }
       }
 
-      const res = await api.getTodos(queryParams);
+      const res = await api.getTodos(queryParams, signal);
       setTodos(res.data);
     } catch (err) {
-      setApiError(err);
+      if (err.name !== 'AbortError') {
+        setApiError(err);
+      }
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -61,8 +69,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetchTodos();
+    const controller = new AbortController();
+    fetchTodos(controller.signal);
     fetchStats();
+
+    return () => controller.abort();
   }, [activeView, subFilter, filters]);
 
   const handleCreateOrUpdate = async (todoData) => {

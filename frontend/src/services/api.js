@@ -21,14 +21,16 @@ class ApiService {
     return data;
   }
 
-  async getTodos(filters = {}) {
+  async getTodos(filters = {}, signal = null) {
     const params = new URLSearchParams();
     if (filters.status) params.append('status', filters.status);
     if (filters.priority) params.append('priority', filters.priority);
     if (filters.search) params.append('search', filters.search);
+    if (filters.taskType) params.append('taskType', filters.taskType);
+    if (filters.frequency) params.append('frequency', filters.frequency);
 
     const queryString = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${API_BASE}${queryString}`);
+    const res = await fetch(`${API_BASE}${queryString}`, { signal });
     return this.handleResponse(res);
   }
 
