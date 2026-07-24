@@ -1,7 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 
 export default function TodoFilter({ filters, onFilterChange }) {
+  const [searchTerm, setSearchTerm] = useState(filters.search || '');
+
+  // Keep local search term in sync if parent resets filters
+  useEffect(() => {
+    setSearchTerm(filters.search || '');
+  }, [filters.search]);
+
+  // Debounce search update to parent on typing pause
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== (filters.search || '')) {
+        onFilterChange({ ...filters, search: searchTerm });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   return (
     <div className="filter-bar">
       <div className="search-box">
@@ -10,8 +28,8 @@ export default function TodoFilter({ filters, onFilterChange }) {
           type="text"
           className="search-input"
           placeholder="Search tasks..."
-          value={filters.search || ''}
-          onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 

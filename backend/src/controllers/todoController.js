@@ -3,8 +3,8 @@ const todoService = require('../services/todoService');
 class TodoController {
   getTodos(req, res, next) {
     try {
-      const { status, priority, search } = req.query;
-      const todos = todoService.getAllTodos({ status, priority, search });
+      const { status, priority, search, taskType, frequency } = req.query;
+      const todos = todoService.getAllTodos({ status, priority, search, taskType, frequency });
       res.json({
         success: true,
         count: todos.length,

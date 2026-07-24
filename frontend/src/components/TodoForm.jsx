@@ -18,7 +18,7 @@ export default function TodoForm({ onSubmit, editingTodo, onCancelEdit, defaultT
       setFrequency(editingTodo.frequency === 'weekly' ? 'weekly' : 'daily');
       setDueDate(editingTodo.dueDate || '');
     } else {
-      resetForm();
+      setTaskType(defaultTaskType === 'recurring' ? 'recurring' : 'dueDate');
     }
   }, [editingTodo, defaultTaskType]);
 
