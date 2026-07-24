@@ -23,29 +23,35 @@ class TodoRepository {
         this.todos = [
           {
             id: '1',
-            title: 'Design UI Theme & Design Tokens',
-            description: 'Implement dark/light mode CSS variables adhering to OpenKnowledge guidelines.',
+            title: 'Design Sidebar Navigation & Task Types',
+            description: 'Implement sidebar switching for Due Date tasks vs Daily/Weekly tasks.',
             completed: true,
             priority: 'high',
+            taskType: 'dueDate',
+            frequency: 'once',
             dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
             createdAt: new Date().toISOString()
           },
           {
             id: '2',
-            title: 'Setup Layered Backend API Architecture',
-            description: 'Controllers, Services, Repositories, and standard Error Handling Middleware.',
-            completed: true,
+            title: 'Daily Code Review & Standup',
+            description: 'Check team pull requests and plan daily workflow tasks.',
+            completed: false,
             priority: 'high',
-            dueDate: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+            taskType: 'recurring',
+            frequency: 'daily',
+            dueDate: null,
             createdAt: new Date().toISOString()
           },
           {
             id: '3',
-            title: 'Implement Toast Error Feedback UI',
-            description: 'Catch 400/500 API errors and display structured alerts on the frontend.',
+            title: 'Weekly Backup & System Maintenance',
+            description: 'Perform database backup and audit system logs once a week.',
             completed: false,
             priority: 'medium',
-            dueDate: new Date(Date.now() + 259200000).toISOString().split('T')[0],
+            taskType: 'recurring',
+            frequency: 'weekly',
+            dueDate: null,
             createdAt: new Date().toISOString()
           }
         ];
@@ -74,13 +80,18 @@ class TodoRepository {
   }
 
   create(todoData) {
+    const taskType = todoData.taskType || (todoData.frequency && todoData.frequency !== 'once' ? 'recurring' : 'dueDate');
+    const frequency = todoData.frequency || (taskType === 'recurring' ? 'daily' : 'once');
+
     const newTodo = {
       id: Date.now().toString() + Math.random().toString(36).substring(2, 5),
       title: todoData.title.trim(),
       description: (todoData.description || '').trim(),
       completed: false,
       priority: (todoData.priority || 'medium').toLowerCase(),
-      dueDate: todoData.dueDate || null,
+      taskType: taskType,
+      frequency: frequency,
+      dueDate: taskType === 'dueDate' ? (todoData.dueDate || null) : null,
       createdAt: new Date().toISOString()
     };
     this.todos.unshift(newTodo);
@@ -93,12 +104,18 @@ class TodoRepository {
     if (index === -1) return null;
 
     const existing = this.todos[index];
+    const taskType = updateFields.taskType !== undefined ? updateFields.taskType : existing.taskType || 'dueDate';
+    const frequency = updateFields.frequency !== undefined ? updateFields.frequency : existing.frequency || 'once';
+
     const updated = {
       ...existing,
       ...updateFields,
       title: updateFields.title !== undefined ? updateFields.title.trim() : existing.title,
       description: updateFields.description !== undefined ? updateFields.description.trim() : existing.description,
       priority: updateFields.priority !== undefined ? updateFields.priority.toLowerCase() : existing.priority,
+      taskType: taskType,
+      frequency: frequency,
+      dueDate: taskType === 'dueDate' ? (updateFields.dueDate !== undefined ? updateFields.dueDate : existing.dueDate) : null,
       updatedAt: new Date().toISOString()
     };
 

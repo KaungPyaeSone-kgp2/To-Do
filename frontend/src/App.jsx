@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import StatsSummary from './components/StatsSummary';
 import TodoForm from './components/TodoForm';
 import TodoFilter from './components/TodoFilter';
@@ -11,6 +12,8 @@ export default function App() {
   const [theme, setTheme] = useState('dark');
   const [todos, setTodos] = useState([]);
   const [stats, setStats] = useState({});
+  const [activeView, setActiveView] = useState('all'); // 'all', 'dueDate', 'recurring'
+  const [subFilter, setSubFilter] = useState('all'); // 'all', 'daily', 'weekly'
   const [filters, setFilters] = useState({ status: 'all', priority: '', search: '' });
   const [editingTodo, setEditingTodo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +31,18 @@ export default function App() {
   const fetchTodos = async () => {
     try {
       setIsLoading(true);
-      const res = await api.getTodos(filters);
+      const queryParams = { ...filters };
+
+      if (activeView === 'dueDate') {
+        queryParams.taskType = 'dueDate';
+      } else if (activeView === 'recurring') {
+        queryParams.taskType = 'recurring';
+        if (subFilter !== 'all') {
+          queryParams.frequency = subFilter;
+        }
+      }
+
+      const res = await api.getTodos(queryParams);
       setTodos(res.data);
     } catch (err) {
       setApiError(err);
@@ -49,7 +63,7 @@ export default function App() {
   useEffect(() => {
     fetchTodos();
     fetchStats();
-  }, [filters]);
+  }, [activeView, subFilter, filters]);
 
   const handleCreateOrUpdate = async (todoData) => {
     try {
@@ -89,27 +103,47 @@ export default function App() {
     }
   };
 
+  const handleViewChange = (view) => {
+    setActiveView(view);
+    if (view === 'recurring') {
+      setSubFilter('all');
+    }
+  };
+
   return (
     <div className="app-container">
       <Header theme={theme} onToggleTheme={toggleTheme} />
 
-      <StatsSummary stats={stats} />
+      <div className="app-layout">
+        <Sidebar
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          subFilter={subFilter}
+          onSubFilterChange={setSubFilter}
+          stats={stats}
+        />
 
-      <TodoForm
-        onSubmit={handleCreateOrUpdate}
-        editingTodo={editingTodo}
-        onCancelEdit={() => setEditingTodo(null)}
-      />
+        <main className="main-content">
+          <StatsSummary stats={stats} />
 
-      <TodoFilter filters={filters} onFilterChange={setFilters} />
+          <TodoForm
+            onSubmit={handleCreateOrUpdate}
+            editingTodo={editingTodo}
+            onCancelEdit={() => setEditingTodo(null)}
+            defaultTaskType={activeView === 'recurring' ? 'recurring' : 'dueDate'}
+          />
 
-      <TodoList
-        todos={todos}
-        onToggle={handleToggle}
-        onEdit={(todo) => setEditingTodo(todo)}
-        onDelete={handleDelete}
-        isLoading={isLoading}
-      />
+          <TodoFilter filters={filters} onFilterChange={setFilters} />
+
+          <TodoList
+            todos={todos}
+            onToggle={handleToggle}
+            onEdit={(todo) => setEditingTodo(todo)}
+            onDelete={handleDelete}
+            isLoading={isLoading}
+          />
+        </main>
+      </div>
 
       <ErrorToast error={apiError} onClose={() => setApiError(null)} />
     </div>

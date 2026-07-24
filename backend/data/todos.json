@@ -5,6 +5,8 @@
     "description": "",
     "completed": false,
     "priority": "high",
+    "taskType": "dueDate",
+    "frequency": "once",
     "dueDate": "2026-07-31",
     "createdAt": "2026-07-23T13:09:33.206Z"
   },
@@ -14,8 +16,32 @@
     "description": "",
     "completed": false,
     "priority": "high",
+    "taskType": "dueDate",
+    "frequency": "once",
     "dueDate": "2026-07-31",
     "createdAt": "2026-07-23T09:26:26.074Z",
     "updatedAt": "2026-07-23T09:26:50.164Z"
+  },
+  {
+    "id": "1784812173207rec",
+    "title": "Daily Practice Code",
+    "description": "Solve daily coding problem or review commits",
+    "completed": false,
+    "priority": "medium",
+    "taskType": "recurring",
+    "frequency": "daily",
+    "dueDate": null,
+    "createdAt": "2026-07-24T00:00:00.000Z"
+  },
+  {
+    "id": "1784812173208rec",
+    "title": "Weekly Progress Sync",
+    "description": "Team review and retrospective meeting once a week",
+    "completed": false,
+    "priority": "high",
+    "taskType": "recurring",
+    "frequency": "weekly",
+    "dueDate": null,
+    "createdAt": "2026-07-24T00:00:00.000Z"
   }
 ]

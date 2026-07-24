@@ -1,8 +1,10 @@
 import React from 'react';
-import { Calendar, Edit2, Trash2 } from 'lucide-react';
+import { Calendar, Repeat, Clock, CalendarDays, Edit2, Trash2 } from 'lucide-react';
 
 export default function TodoItem({ todo, onToggle, onEdit, onDelete }) {
-  const { id, title, description, completed, priority, dueDate } = todo;
+  const { id, title, description, completed, priority, dueDate, taskType, frequency } = todo;
+
+  const isRecurring = taskType === 'recurring' || (frequency && frequency !== 'once');
 
   return (
     <div className={`todo-item ${completed ? 'completed' : ''}`}>
@@ -17,9 +19,22 @@ export default function TodoItem({ todo, onToggle, onEdit, onDelete }) {
       <div className="todo-content">
         <div className="todo-header">
           <h3 className="todo-title">{title}</h3>
-          <span className={`badge-priority ${priority || 'medium'}`}>
-            {priority || 'medium'}
-          </span>
+          <div className="badge-group">
+            {isRecurring ? (
+              <span className={`badge-frequency ${frequency || 'daily'}`}>
+                {frequency === 'weekly' ? <CalendarDays size={12} /> : <Clock size={12} />}
+                <span>{frequency === 'weekly' ? 'Once a week' : 'Daily'}</span>
+              </span>
+            ) : (
+              <span className="badge-frequency once">
+                <Calendar size={12} />
+                <span>Due Date</span>
+              </span>
+            )}
+            <span className={`badge-priority ${priority || 'medium'}`}>
+              {priority || 'medium'}
+            </span>
+          </div>
         </div>
 
         {description && (
@@ -27,10 +42,17 @@ export default function TodoItem({ todo, onToggle, onEdit, onDelete }) {
         )}
 
         <div className="todo-meta">
-          {dueDate && (
+          {!isRecurring && dueDate && (
             <div className="meta-item">
               <Calendar size={14} />
               <span>Due: {dueDate}</span>
+            </div>
+          )}
+
+          {isRecurring && (
+            <div className="meta-item meta-recurring">
+              <Repeat size={14} />
+              <span>Repeats: {frequency === 'weekly' ? 'Once every week' : 'Every single day'}</span>
             </div>
           )}
         </div>
